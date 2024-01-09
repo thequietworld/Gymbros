@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Workouts</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        header {
+            padding: 10px;
+            background-color: #001f3f; /* Navy Blue */
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #001f3f; /* Navy Blue */
+            color: #fff;
+        }
+
+        #workout-container {
+            display: none;
+        }
+
+        .toggle-button {
+            padding: 10px;
+            background-color: #001f3f; /* Navy Blue */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        footer {
+            background-color: #000; /* Black */
+            color: #fff;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: calc(100% - 20px); /* Full width minus 20px for the margins */
+            margin: 0 10px; /* 10px margin from the sides */
+            display: flex;
+            justify-content: space-around; /* Center the buttons with space around them */
+            box-sizing: border-box;
+        }
+
+        .footer-button {
+            padding: 8px 16px;
+            background-color: #fff;
+            color: #000; /* Black */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .footer-button-left,
+        .footer-button-right {
+            align-self: flex-end; /* Align to the bottom */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fitness Hub</h1>
+    </header>
+
+    <button class="toggle-button" onclick="showWorkout('push1')">Push 1</button>
+    <button class="toggle-button" onclick="showWorkout('push2')">Push 2</button>
+    <button class="toggle-button" onclick="showWorkout('pull1')">Pull 1</button>
+    <button class="toggle-button" onclick="showWorkout('pull2')">Pull 2</button>
+    <button class="toggle-button" onclick="showWorkout('legs1')">Legs 1</button>
+    <button class="toggle-button" onclick="showWorkout('legs2')">Legs 2</button>
+
+    <div id="workout-container">
+        <h2 id="workout-title">Workouts</h2>
+        <table id="workout-table">
+            <thead>
+                <tr>
+                    <th>Exercise</th>
+                    <th>Sets</th>
+                    <th>Reps</th>
+                    <th>Weight</th>
+                </tr>
+            </thead>
+            <tbody id="workout-body">
+                <!-- Workout details will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function showWorkout(type) {
+            var workoutContainer = document.getElementById('workout-container');
+            workoutContainer.style.display = 'block';
+
+            var workoutTitle = document.getElementById('workout-title');
+            var workoutTable = document.getElementById('workout-table');
+            var workoutBody = document.getElementById('workout-body');
+
+            switch(type) {
+                case 'push1':
+                    workoutTitle.innerText = 'Push 1 Workout';
+                    fillWorkoutTable(workoutBody, push1Workout);
+                    break;
+                case 'push2':
+                    workoutTitle.innerText = 'Push 2 Workout';
+                    fillWorkoutTable(workoutBody, push2Workout);
+                    break;
+                case 'pull1':
+                    workoutTitle.innerText = 'Pull 1 Workout';
+                    fillWorkoutTable(workoutBody, pull1Workout);
+                    break;
+                case 'pull2':
+                    workoutTitle.innerText = 'Pull 2 Workout';
+                    fillWorkoutTable(workoutBody, pull2Workout);
+                    break;
+                case 'legs1':
+                    workoutTitle.innerText = 'Legs 1 Workout';
+                    fillWorkoutTable(workoutBody, legs1Workout);
+                    break;
+                case 'legs2':
+                    workoutTitle.innerText = 'Legs 2 Workout';
+                    fillWorkoutTable(workoutBody, legs2Workout);
+                    break;
+                default:
+                    workoutContainer.style.display = 'none';
+            }
+        }
+
+        function fillWorkoutTable(body, workout) {
+            // Clear previous content
+            body.innerHTML = '';
+
+            // Fill the table with workout details
+            workout.forEach(exercise => {
+                var row = document.createElement('tr');
+                for (const detail of exercise) {
+                    var cell = document.createElement('td');
+                    cell.innerText = detail;
+                    row.appendChild(cell);
+                }
+                body.appendChild(row);
+            });
+        }
+
+        // Push 1 Workout
+        var push1Workout = [
+            ['Barbell Overhead Press', 4, '8-12', 'Moderate'],
+            ['Dumbbell Bench Press', 3, '10-15', 'Moderate'],
+            ['Cable Lateral Raises', 3, '12-15', 'Light'],
+            ['Close-Grip Bench Press', 3, '10-12', 'Moderate'],
+            ['Tricep Dips', 3, '12-15', 'Body Weight'],
+            ['Face Pulls', 3, '12-15', 'Light'],
+            ['Overhead Tricep Extension', 3, '10-12', 'Moderate'],
+        ];
+
+        // Push 2 Workout
+        var push2Workout = [
+            ['Dumbbell Shoulder Press', 4, '8-12', 'Moderate'],
+            ['Incline Dumbbell Flyes', 3, '10-15', 'Moderate'],
+            ['Tricep Dips', 3, '12-15', 'Body Weight'],
+            ['Push-Ups', 3, '15-20', 'Body Weight'],
+            ['Cable Tricep Pushdowns', 3, '12-15', 'Light'],
+            ['Hammer Curls', 3, '10-12', 'Moderate'],
+            ['Barbell Bicep Curl', 3, '10-12', 'Moderate'],
+        ];
+
+        // Pull 1 Workout
+        var pull1Workout = [
+            ['Push Press', 4, '8-12', 'Moderate'],
+            ['Chest Flyes', 3, '10-15', 'Moderate'],
+            ['Tricep Kickbacks', 3, '12-15', 'Light'],
+            ['Diamond Push-Ups', 3, '10-12', 'Body Weight'],
+            ['Chin-Ups', 3, '10-15', 'Body Weight'],
+            ['Seated Cable Rows', 3, '12-15', 'Moderate'],
+            ['Concentration Curls', 3, '10-12', 'Moderate'],
+        ];
+
+        // Pull 2 Workout
+        var pull2Workout = [
+            ['Arnold Press', 4, '8-12', 'Moderate'],
+            ['Machine Chest Press', 3, '10-15', 'Moderate'],
+            ['Tricep Overhead Extension', 3, '12-15', 'Light'],
+            ['Push-Ups', 3, '15-20', 'Body Weight'],
+            ['Wide-Grip Pull-Ups', 3, '10-15', 'Body Weight'],
+            ['Bent Over Rows', 3, '12-15', 'Moderate'],
+            ['Dumbbell Curls', 3, '10-12', 'Moderate'],
+        ];
+
+        // Legs 1 Workout
+        var legs1Workout = [
+            ['Push Jerk', 4, '8-12', 'Moderate'],
+            ['Cable Crossover', 3, '10-15', 'Moderate'],
+            ['Tricep Dips', 3, '12-15', 'Body Weight'],
+            ['Decline Push-Ups', 3, '15-20', 'Body Weight'],
+            ['Box Jumps', 3, '10-12', 'Body Weight'],
+            ['Walking Lunges', 3, '12-15', 'Moderate'],
+            ['Leg Extensions', 3, '10-12', 'Light'],
+        ];
+
+        // Legs 2 Workout
+        var legs2Workout = [
+            ['Military Press', 4, '8-12', 'Moderate'],
+            ['Incline Bench Press', 3, '10-15', 'Moderate'],
+            ['Tricep Skull Crushers', 3, '12-15', 'Light'],
+            ['Push-Ups', 3, '15-20', 'Body Weight'],
+            ['Wide-Grip Pull-Ups', 3, '10-15', 'Body Weight'],
+            ['Bent Over Rows', 3, '12-15', 'Moderate'],
+            ['Dumbbell Curls', 3, '10-12', 'Moderate'],
+        ];
+    </script>
+    <footer>
+        <a href="home.html" class="footer-button">Home</a>
+        
+    </footer>
+</body>
+</html>

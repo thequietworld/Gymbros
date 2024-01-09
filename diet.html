@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal and Calorie Tracker</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        header {
+            padding: 20px;
+            background: linear-gradient(to right, #001f3f, #003366); /* Gradient Navy Blue */
+            box-sizing: border-box;
+            color: #fff;
+            font-size: 24px;
+        }
+
+        section {
+            width: 80%;
+            margin: 100px auto; /* Adjusted margin for centering */
+            background: linear-gradient(to bottom, #001f3f, #003366); /* Gradient Navy Blue */
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        input {
+            padding: 10px;
+            margin-bottom: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #333;
+        }
+
+        button {
+            padding: 12px;
+            background: linear-gradient(to right, #001f3f, #003366); /* Gradient Navy Blue */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            font-size: 16px;
+        }
+        footer {
+            background-color: #000; /* Black */
+            color: #fff;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: calc(100% - 20px); /* Full width minus 20px for the margins */
+            margin: 0 10px; /* 10px margin from the sides */
+            display: flex;
+            justify-content: space-around; /* Center the buttons with space around them */
+            box-sizing: border-box;
+        }
+
+        .footer-button {
+            padding: 8px 16px;
+            background-color: #fff;
+            color: #000; /* Black */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .footer-button-left,
+        .footer-button-right {
+            align-self: flex-end; /* Align to the bottom */
+        }
+    </style>
+
+
+    <header>
+        <h1>Meal and Calorie Tracker</h1>
+    </header>
+
+    <section>
+        <form id="mealForm">
+            <label for="mealName">Meal Name:</label>
+            <input type="text" id="mealName" required>
+
+            <label for="calories">Calories:</label>
+            <input type="number" id="calories" required>
+
+            <button type="button" onclick="trackMeal()">Add Meal</button>
+            <button type="button" onclick="showHistory()">History</button>
+        </form>
+
+        <h2>Tracked Meals</h2>
+        <ul id="mealList"></ul>
+
+        <div class="history-section" id="historySection">
+            <h2>Meal History</h2>
+            <ul class="date-list" id="dateList"></ul>
+            <ul id="historyList"></ul>
+        </div>
+    </section>
+
+    <script>
+        function trackMeal() {
+            const mealName = document.getElementById('mealName').value;
+            const calories = document.getElementById('calories').value;
+
+            if (mealName && calories) {
+                const mealList = document.getElementById('mealList');
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<strong>${mealName}</strong>: ${calories} calories`;
+                mealList.appendChild(listItem);
+
+                // Save meal data with date
+                const today = new Date().toLocaleDateString();
+                const mealData = {
+                    date: today,
+                    meal: {
+                        name: mealName,
+                        calories: calories
+                    }
+                };
+
+                const historyData = JSON.parse(localStorage.getItem('mealHistory')) || [];
+                historyData.push(mealData);
+                localStorage.setItem('mealHistory', JSON.stringify(historyData));
+
+                // Clear form fields after adding a meal
+                document.getElementById('mealForm').reset();
+            } else {
+                alert('Please enter both meal name and calories.');
+            }
+        }
+
+        function showHistory() {
+            const historySection = document.getElementById('historySection');
+            const dateList = document.getElementById('dateList');
+            const historyList = document.getElementById('historyList');
+
+            // Clear previous data
+            dateList.innerHTML = '';
+            historyList.innerHTML = '';
+
+            // Display history
+            const historyData = JSON.parse(localStorage.getItem('mealHistory')) || [];
+            const uniqueDates = [...new Set(historyData.map(entry => entry.date))];
+
+            if (uniqueDates.length === 0) {
+                alert('No meal history found.');
+                return;
+            }
+
+            historySection.style.display = 'block';
+
+            uniqueDates.forEach(date => {
+                const dateItem = document.createElement('li');
+                dateItem.classList.add('date-list-item');
+                dateItem.textContent = date;
+                dateItem.addEventListener('click', () => displayMealsByDate(date, historyData));
+                dateList.appendChild(dateItem);
+            });
+        }
+
+        function displayMealsByDate(date, historyData) {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            const mealsOnDate = historyData.filter(entry => entry.date === date);
+
+            mealsOnDate.forEach(entry => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<strong>${entry.meal.name}</strong>: ${entry.meal.calories} calories`;
+                historyList.appendChild(listItem);
+            });
+        }
+    </script>
+
+    <footer>
+        <a href="home.html" class="footer-button">Home</a>
+
+    </footer>
+
+
+    </html>

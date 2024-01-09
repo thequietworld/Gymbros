@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combined Generator</title>
+    <style>
+
+      body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-color: #000;
+    color: #fff;
+}
+
+header {
+    padding: 10px;
+    background-color: #001f3f; /* Navy Blue */
+    box-sizing: border-box;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #000; /* Black */
+}
+
+th, td {
+    border: 1px solid #fff; /* White */
+    text-align: left;
+    padding: 10px;
+    color: #fff; /* White */
+}
+
+th {
+    background-color: #001f3f; /* Navy Blue */
+}
+
+footer {
+    background-color: #000; /* Black */
+    color: #fff;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: calc(100% - 20px); /* Full width minus 20px for the margins */
+    margin: 0 10px; /* 10px margin from the sides */
+    display: flex;
+    justify-content: space-around; /* Center the buttons with space around them */
+    box-sizing: border-box;
+}
+
+.footer-button {
+    padding: 8px 16px;
+    background-color: #fff;
+    color: #000; /* Black */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.footer-button-left,
+.footer-button-right {
+    align-self: flex-end; /* Align to the bottom */
+}
+
+.details-row {
+    display: none;
+}
+
+.details-row.active {
+    display: table-row;
+}
+
+.details-list {
+    list-style: none;
+    padding: 0;
+}
+
+input {
+    padding: 5px;
+    margin-bottom: 10px;
+    width: 25%;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #001f3f; /* Navy Blue */
+    color: #fff;
+    padding: 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+
+    </style>
+</head>
+<header>
+    <h1>Randomizer</h1>
+</header>
+<br>
+<body>
+    <button id="generateButton">Generate Training</button>
+    <button id="saveButton">Save Workout</button>
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Generator Results</th>
+                <th>Sets</th>
+                <th>Reps</th>
+                <th>Weight (kg)</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+    </table>
+
+    <script>
+        function pickRandomCategories(categories, count) {
+            const selectedCategories = [];
+            for (let i = 0; count > 0; i++) {
+                const probability = Math.random();
+                let categoryIndex;
+
+                if (probability < 0.55 && categories.slice(0, 9).length > 0) {
+                    categoryIndex = Math.floor(Math.random() * Math.min(categories.slice(0, 9).length, categories.length));
+                } else if (categories.slice(10, 17).length > 0) {
+                    categoryIndex = Math.floor(Math.random() * categories.slice(10, 17).length) + 8;
+                } else {
+                    break; // No more categories left
+                }
+
+                selectedCategories.push(categories[categoryIndex]);
+                categories.splice(categoryIndex, 1);
+                count--;
+            }
+
+            return selectedCategories;
+        }
+
+        function pickRandomSubcategory(subcategories) {
+            const totalProbabilities = subcategories.reduce((sum, subcategory) => sum + subcategory.probability, 0);
+            const normalizedProbabilities = subcategories.map(subcategory => subcategory.probability / totalProbabilities);
+
+            const randomValue = Math.random();
+            let cumulativeProbability = 0;
+
+            for (let i = 0; i < normalizedProbabilities.length; i++) {
+                cumulativeProbability += normalizedProbabilities[i];
+                if (randomValue <= cumulativeProbability) {
+                    return subcategories[i].name;
+                }
+            }
+
+            // Fallback (should not reach here, but just in case)
+            return subcategories[0].name;
+        }
+
+        const mainCategories = [
+            { name: 'Pull Ups', subcategories: [{ name: 'Pronated', probability: 0.3 }, { name: 'Supernated', probability: 0.2 }, { name: 'Neutral', probability: 0.2 }, { name: 'Pull Downs', probability: 0.3 }] },
+            { name: 'Squat', subcategories: [{ name: 'Hack', probability: 0.24 }, { name: 'Barbell', probability: 0.25 }, { name: 'smith', probability: 0.25 }, { name: 'Leg Press', probability: 0.25 }] },
+            { name: 'Bench', subcategories: [{ name: 'Incline', probability: 0.6 }, { name: 'Flat', probability: 0.25 }, { name: 'close Grip', probability: 0.15 }] },
+            { name: 'Pushdowns', subcategories: [{ name: 'rope', probability: 0.6 }, { name: 'T bar', probability: 0.2 }, { name: 'Vbar', probability: 0.2 }] },
+            { name: 'Curls', subcategories: [{ name: 'Normal', probability: 0.5 }, { name: 'Preacher', probability: 0.25 }, { name: 'Cable', probability: 0.25 }] },
+            { name: 'Hamstring Curls', subcategories: [{ name: '', probability: 0.25 }, { name: '', probability: 0.25 }, { name: '', probability: 0.25 }, { name: '', probability: 0.25 }] },
+            { name: 'Shoulder Press', subcategories: [{ name: 'Dumbbell', probability: 0.4 }, { name: 'Machine', probability: 0.5 }, { name: 'Arnold', probability: 0.1 }] },
+            { name: 'Calf Raise', subcategories: [{ name: 'Seated', probability: 0.7 }, { name: 'Leg press', probability: 0.15 }, { name: 'Smith machine', probability: 0.15 }] },
+            { name: 'Bent Over Rows', subcategories: [{ name: 'Dumbbell', probability: 0.4 }, { name: 'Low', probability: 0.1 }, { name: 'Cable', probability: 0.4 }, { name: 'High', probability: 0.1 }] },
+            { name: 'Flys', subcategories: [{ name: 'High', probability: 1/3 }, { name: 'Middle', probability: 1/3 }, { name: 'Low', probability: 1/3 }] },
+            { name: 'Hammer Curles', subcategories: [{ name: 'Dumbbell', probability: 0.6 }, { name: 'Rope', probability: 0.4 }] },
+            { name: 'Leg Extension', subcategories: [{ name: '', probability: 1.0 }] },
+            { name: 'Lateral Raise', subcategories: [{ name: 'Dumbbell', probability: 0.3 }, { name: 'Cable', probability: 0.7 }] },
+            { name: 'Skull Crushers', subcategories: [{ name: 'Dumbbell', probability: 0.5 }, { name: 'Barbell', probability: 0.5 }] },
+            { name: 'Overhead Extension', subcategories: [{ name: 'Dumbbell', probability: 0.5 }, { name: 'Cable', probability: 0.5 }] },
+            { name: 'Rear Delts', subcategories: [{ name: 'Machine', probability: 1/3 }, { name: 'Cable', probability: 1/3}, { name: 'Dumbbell', probability: 1/3 }] },
+            { name: 'Dead lift', subcategories: [{ name: '', probability: 0.5 },{ name: '', probability: 0.5 }] },
+
+        ];
+
+
+        const morningTrainingRandomizer = [
+            {
+                name: 'Abs',
+                subcategories: [
+                    { name: 'Raise', probability: 0.25 },
+                    { name: 'V-sit', probability: 0.25 },
+                    { name: 'Machine', probability: 0.25 },
+                    { name: 'Crunch', probability: 0.25 }
+                ],
+                probability: 0.4
+            },
+            {
+                name: 'Neck',
+                subcategories: [
+                    { name: 'front', probability: 1/3 },
+                    { name: 'side', probability: 1/3 },
+                    { name: 'Back', probability: 1/3 }
+                ],
+                probability: 0.4
+            },
+        ];
+
+        function generateResults() {
+            // Clear previous results
+            document.getElementById('resultsBody').innerHTML = '';
+
+            const resultsBody = document.getElementById('resultsBody');
+
+            // Generate Random Categories
+            const selectedCategories = pickRandomCategories(mainCategories, 7);
+
+            for (let i = 0; i < selectedCategories.length; i++) {
+                const row = resultsBody.insertRow();
+                const cell1 = row.insertCell(0);
+                cell1.textContent = `${selectedCategories[i].name} - ${pickRandomSubcategory(selectedCategories[i].subcategories)}`;
+
+                // Add input fields for Sets, Reps, and Weight
+                const cellSets = row.insertCell(1);
+                const inputSets = document.createElement('input');
+                inputSets.type = 'text';
+                inputSets.name = `set${i + 1}_sets`;
+                cellSets.appendChild(inputSets);
+
+                const cellReps = row.insertCell(2);
+                for (let j = 0; j < 4; j++) {
+                    const inputReps = document.createElement('input');
+                    inputReps.type = 'text';
+                    inputReps.name = `set${i + 1}_reps_${j + 1}`;
+                    cellReps.appendChild(inputReps);
+                }
+
+                const cellWeight = row.insertCell(3);
+                for (let j = 0; j < 4; j++) {
+                    const inputWeight = document.createElement('input');
+                    inputWeight.type = 'text';
+                    inputWeight.name = `set${i + 1}_weight_${j + 1}`;
+                    cellWeight.appendChild(inputWeight);
+                }
+            }
+
+            // Generate Morning Training
+            let likelihood = 0.8; // Initial likelihood
+
+            for (let i = 0; i < 5; i++) { // Repeat 5 times or adjust as needed
+                const showMorningTraining = Math.random() < likelihood;
+
+                if (showMorningTraining) {
+                    const selectedMorningCategories = pickRandomCategories(morningTrainingRandomizer, 1);
+
+                    selectedMorningCategories.forEach(category => {
+                        const row = resultsBody.insertRow();
+                        const cell1 = row.insertCell(0);
+                        cell1.textContent = `${category.name} - ${pickRandomSubcategory(category.subcategories)}`;
+
+                        // Add input fields for Sets, Reps, and Weight
+                        const cellSets = row.insertCell(1);
+                        const inputSets = document.createElement('input');
+                        inputSets.type = 'text';
+                        inputSets.name = `set${i + 1}_sets`;
+                        cellSets.appendChild(inputSets);
+
+                        const cellReps = row.insertCell(2);
+                        for (let j = 0; j < 4; j++) {
+                            const inputReps = document.createElement('input');
+                            inputReps.type = 'text';
+                            inputReps.name = `set${i + 1}_reps_${j + 1}`;
+                            cellReps.appendChild(inputReps);
+                        }
+
+                        const cellWeight = row.insertCell(3);
+                        for (let j = 0; j < 4; j++) {
+                            const inputWeight = document.createElement('input');
+                            inputWeight.type = 'text';
+                            inputWeight.name = `set${i + 1}_weight_${j + 1}`;
+                            cellWeight.appendChild(inputWeight);
+                        }
+                    });
+                } else {
+                    continue;
+                }
+
+                likelihood -= 0.1; // Decrease likelihood for the next repetition
+            }
+        }
+
+        function saveWorkout() {
+            const workoutData = {
+                date: new Date().toLocaleDateString(),
+                generatedResults: [], // Change the property name
+                userInputs: []
+            };
+
+            // Save generated results (categories)
+            const generatedResults = document.querySelectorAll('#resultsBody td:first-child');
+            generatedResults.forEach(result => {
+                workoutData.generatedResults.push(result.textContent.trim());
+            });
+
+            // Save user inputs
+            const userInputs = document.querySelectorAll('#resultsBody input');
+            userInputs.forEach(input => {
+                const [setType, inputType, index] = input.name.split('_');
+                const setNumber = parseInt(setType.match(/\d+/)[0]);
+                const inputIndex = parseInt(index);
+
+                if (!workoutData.userInputs[setNumber - 1]) {
+                    workoutData.userInputs[setNumber - 1] = {
+                        sets: '',
+                        reps: [],
+                        weight: []
+                    };
+                }
+
+                if (inputType === 'sets') {
+                    workoutData.userInputs[setNumber - 1].sets = input.value.trim();
+                } else if (inputType === 'reps') {
+                    workoutData.userInputs[setNumber - 1].reps[inputIndex - 1] = input.value.trim();
+                } else if (inputType === 'weight') {
+                    workoutData.userInputs[setNumber - 1].weight[inputIndex - 1] = input.value.trim();
+                }
+            });
+
+            // Log the workoutData
+            console.log('Saved Workout Data:', workoutData);
+
+            // Store data in local storage
+            const savedWorkouts = JSON.parse(localStorage.getItem('savedWorkouts')) || [];
+            savedWorkouts.push(workoutData);
+            localStorage.setItem('savedWorkouts', JSON.stringify(savedWorkouts));
+
+            alert('Workout saved successfully!');
+        }
+
+
+
+        document.getElementById('generateButton').addEventListener('click', generateResults);
+        document.getElementById('saveButton').addEventListener('click', saveWorkout);
+
+    </script>
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Exercise Vault</title>
+
+        <style>
+
+        </style>
+    </head>
+    <body>
+        <h1></h1>
+
+        <!-- Add a button to toggle the visibility -->
+        <button id="toggleButton">Exercise Vault</button>
+
+        <table id="savedWorkoutsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody id="savedWorkoutsBody"></tbody>
+        </table>
+
+        <script>
+            function displaySavedWorkouts() {
+                const savedWorkouts = JSON.parse(localStorage.getItem('savedWorkouts')) || [];
+                const savedWorkoutsBody = document.getElementById('savedWorkoutsBody');
+
+                // Clear previous data
+                savedWorkoutsBody.innerHTML = '';
+
+                savedWorkouts.forEach((workout, index) => {
+                    const row = savedWorkoutsBody.insertRow();
+                    const cellDate = row.insertCell(0);
+                    cellDate.textContent = workout.date;
+                    cellDate.classList.add('date-button');
+                    cellDate.addEventListener('click', () => toggleDetails(index));
+
+                    const cellDetails = row.insertCell(1);
+
+                    const detailsRow = savedWorkoutsBody.insertRow();
+                    detailsRow.classList.add('details-row');
+
+                    const detailsCell = detailsRow.insertCell(0);
+                    detailsCell.colSpan = 2;
+
+                    const detailsTable = document.createElement('table');
+                    detailsTable.classList.add('details-table');
+
+                    const headerRow = detailsTable.insertRow();
+                    const headers = ['Exercise', 'Sets', 'Reps', 'Weight'];
+
+                    headers.forEach(headerText => {
+                        const header = document.createElement('th');
+                        header.textContent = headerText;
+                        headerRow.appendChild(header);
+                    });
+
+                    const maxRows = Math.max(workout.generatedCategories.length, workout.userInputs.length);
+
+                    for (let i = 0; i < maxRows; i++) {
+                        const exerciseRow = detailsTable.insertRow();
+
+                        const generatedExercise = workout.generatedCategories[i] || '';
+                        const generatedCell = exerciseRow.insertCell();
+                        generatedCell.textContent = generatedExercise;
+
+                        const userInput = workout.userInputs[i] || { sets: '', reps: '', weight: '' };
+                        const inputData = [userInput.sets, userInput.reps, userInput.weight];
+
+                        inputData.forEach(data => {
+                            const cell = exerciseRow.insertCell();
+                            cell.textContent = data === undefined ? '' : data;
+                        });
+                    }
+
+                    detailsCell.appendChild(detailsTable);
+                });
+            }
+
+            function toggleDetails(index) {
+                const detailsRow = document.querySelectorAll('.details-row')[index];
+                detailsRow.classList.toggle('active');
+            }
+
+            // Add event listener to the button
+            document.getElementById('toggleButton').addEventListener('click', () => {
+                const detailsTable = document.getElementById('savedWorkoutsTable');
+                detailsTable.style.display = detailsTable.style.display === 'none' ? '' : 'none';
+            });
+
+            // Initially hide the saved workouts section
+            document.getElementById('savedWorkoutsTable').style.display = 'none';
+
+            displaySavedWorkouts();  // Display saved workouts initially
+        </script>
+    </body>
+    </html>
+
+<br>
+<br>
+<br>
+<footer>
+    <a href="home.html" class="footer-button">Home</a>
+
+</footer>
+</body>
+</html>

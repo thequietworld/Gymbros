@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Website</title>
+    <style>
+      body {
+  background-color: #000;
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+header {
+  padding: 2px;
+  background-color: #001f3f; /* Navy Blue */
+  box-sizing: border-box;
+}
+
+#fitness-image {
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+  object-fit: cover;
+  margin: 0 auto;
+}
+
+#buttons-container {
+  margin: 50px auto;
+}
+
+.button {
+  display: block;
+  width: 60%;
+  padding: 15px; /* Reduced padding for a more compact appearance */
+  margin: 10px auto;
+  font-size: 30px; /* Adjusted font size for better proportion */
+  text-align: center;
+  text-decoration: none;
+  background-color: #001f3f; /* Navy Blue */
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+footer {
+  background-color: #000; /* Black */
+  color: #fff;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: calc(100% - 20px); /* Full width minus 20px for the margins */
+  margin: 0 10px; /* 10px margin from the sides */
+  display: flex;
+  justify-content: space-around; /* Center the buttons with space around them */
+  box-sizing: border-box;
+}
+
+.footer-button {
+  padding: 8px 16px;
+  background-color: #fff;
+  color: #000; /* Black */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.footer-button-left,
+.footer-button-right {
+  align-self: flex-end; /* Align to the bottom */
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Gymbro</h1>
+    </header>
+
+    <img id="fitness-image" src="https://images.fitnessfirst.com.au/29v1tt20s4yg/2p8ICL5HkFWhJMCr5qPkc0/28d20677dc19402a83d04933dd43ad68/600x300_0004_Fitness_First_HIIT.jpg?w=600&h=300&fl=progressive&q=100&fm=jpg" alt="Fitness Image">
+
+    <div id="buttons-container">
+        <a href="pushpulllegs.html" class="button">PPL split </a>
+        <a href="gymbro.html" class="button">Random</a>
+        <a href="diet.html" class="button">diet</a>
+    </div>
+    <footer>
+        <a href="home.html" class="footer-button">Home</a>
+
+    </footer>
+</body>
+</html>
