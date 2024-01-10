@@ -287,53 +287,46 @@ button {
             }
         }
 
-        function saveWorkout() {
-            const workoutData = {
-                date: new Date().toLocaleDateString(),
-                generatedResults: [], // Change the property name
-                userInputs: []
-            };
+function saveWorkout() {
+    // Assuming you have a function to generate workout data
+    const generatedCategories = generateWorkoutCategories(); // Replace with your actual function
 
-            // Save generated results (categories)
-            const generatedResults = document.querySelectorAll('#resultsBody td:first-child');
-            generatedResults.forEach(result => {
-                workoutData.generatedResults.push(result.textContent.trim());
-            });
+    // Assuming you have a function to get user inputs
+    const userInputs = getUserInputs(); // Replace with your actual function
 
-            // Save user inputs
-            const userInputs = document.querySelectorAll('#resultsBody input');
-            userInputs.forEach(input => {
-                const [setType, inputType, index] = input.name.split('_');
-                const setNumber = parseInt(setType.match(/\d+/)[0]);
-                const inputIndex = parseInt(index);
+    // Create a workout object with both generatedCategories and userInputs
+    const workout = {
+        date: new Date().toLocaleDateString(),
+        generatedCategories: generatedCategories,
+        userInputs: userInputs
+    };
 
-                if (!workoutData.userInputs[setNumber - 1]) {
-                    workoutData.userInputs[setNumber - 1] = {
-                        sets: '',
-                        reps: [],
-                        weight: []
-                    };
-                }
+    // Get existing saved workouts from localStorage
+    const savedWorkouts = JSON.parse(localStorage.getItem('savedWorkouts')) || [];
 
-                if (inputType === 'sets') {
-                    workoutData.userInputs[setNumber - 1].sets = input.value.trim();
-                } else if (inputType === 'reps') {
-                    workoutData.userInputs[setNumber - 1].reps[inputIndex - 1] = input.value.trim();
-                } else if (inputType === 'weight') {
-                    workoutData.userInputs[setNumber - 1].weight[inputIndex - 1] = input.value.trim();
-                }
-            });
+    // Add the new workout to the array
+    savedWorkouts.push(workout);
 
-            // Log the workoutData
-            console.log('Saved Workout Data:', workoutData);
+    // Save the updated array back to localStorage
+    localStorage.setItem('savedWorkouts', JSON.stringify(savedWorkouts));
 
-            // Store data in local storage
-            const savedWorkouts = JSON.parse(localStorage.getItem('savedWorkouts')) || [];
-            savedWorkouts.push(workoutData);
-            localStorage.setItem('savedWorkouts', JSON.stringify(savedWorkouts));
+    // Refresh the displayed workouts
+    displaySavedWorkouts();
+}
 
-            alert('Workout saved successfully!');
-        }
+// Function to generate sample workout categories (replace with your actual function)
+function generateWorkoutCategories() {
+    return ['Exercise 1', 'Exercise 2', 'Exercise 3'];
+}
+
+// Function to get sample user inputs (replace with your actual function)
+function getUserInputs() {
+    return [
+        { sets: 3, reps: 12, weight: '50kg' },
+        { sets: 4, reps: 10, weight: '60kg' },
+        { sets: 3, reps: 15, weight: '40kg' }
+    ];
+}
 
 
 
