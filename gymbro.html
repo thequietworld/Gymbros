@@ -394,77 +394,44 @@ function displaySavedWorkouts() {
         </table>
 
         <script>
-           function displaySavedWorkouts() {
-                const savedWorkouts = JSON.parse(localStorage.getItem('savedWorkouts')) || [];
-                const savedWorkoutsBody = document.getElementById('savedWorkoutsBody');
-            
-                // Clear previous data
-                savedWorkoutsBody.innerHTML = '';
-            
-                savedWorkouts.forEach((workout, index) => {
-                    const row = savedWorkoutsBody.insertRow();
-                    const cellDate = row.insertCell(0);
-                    cellDate.textContent = workout.date;
-                    cellDate.classList.add('date-button');
-                    cellDate.addEventListener('click', () => toggleDetails(index));
-            
-                    const cellDetails = row.insertCell(1);
-            
-                    const detailsRow = savedWorkoutsBody.insertRow();
-                    detailsRow.classList.add('details-row');
-            
-                    const detailsCell = detailsRow.insertCell(0);
-                    detailsCell.colSpan = 2;
-            
-                    const detailsTable = document.createElement('table');
-                    detailsTable.classList.add('details-table');
-            
-                    const headerRow = detailsTable.insertRow();
-                    const headers = ['Exercise', 'Sets', 'Reps', 'Weight'];
-            
-                    headers.forEach(headerText => {
-                        const header = document.createElement('th');
-                        header.textContent = headerText;
-                        headerRow.appendChild(header);
-                    });
-            
-                    const maxRows = Math.max(workout.generatedCategories?.length || 0, workout.userInputs?.length || 0);
-            
-                    for (let i = 0; i < maxRows; i++) {
-                        const exerciseRow = detailsTable.insertRow();
-            
-                        const generatedExercise = workout.generatedCategories?.[i] || '';
-                        const generatedCell = exerciseRow.insertCell();
-                        generatedCell.textContent = generatedExercise;
-            
-                        const userInput = workout.userInputs?.[i] || { sets: '', reps: '', weight: '' };
-                        const inputData = [userInput.sets, userInput.reps, userInput.weight];
-            
-                        inputData.forEach(data => {
-                            const cell = exerciseRow.insertCell();
-                            cell.textContent = data === undefined ? '' : data;
-                        });
-                    }
-            
-                    detailsCell.appendChild(detailsTable);
-                });
-            }
-            
-            function toggleDetails(index) {
-                const detailsRow = document.querySelectorAll('.details-row')[index];
-                detailsRow.classList.toggle('active');
-            }
-            
-            // Add event listener to the button
-            document.getElementById('toggleButton').addEventListener('click', () => {
-                const detailsTable = document.getElementById('savedWorkoutsTable');
-                detailsTable.style.display = detailsTable.style.display === 'none' ? '' : 'none';
-            });
-            
-            // Initially hide the saved workouts section
-            document.getElementById('savedWorkoutsTable').style.display = 'none';
-            
-            displaySavedWorkouts();
+          function saveWorkout() {
+    // Assuming you have a function to generate random workout data
+    const { generatedCategories, userInputs } = generateRandomWorkout();
+
+    // Create a workout object with both generatedCategories and userInputs
+    const workout = {
+        date: new Date().toLocaleDateString(),
+        generatedCategories: generatedCategories,
+        userInputs: userInputs
+    };
+
+    // Get existing saved workouts from localStorage
+    const savedWorkouts = JSON.parse(localStorage.getItem('savedWorkouts')) || [];
+
+    // Add the new workout to the array
+    savedWorkouts.push(workout);
+
+    // Save the updated array back to localStorage
+    localStorage.setItem('savedWorkouts', JSON.stringify(savedWorkouts));
+
+    // Refresh the displayed workouts
+    displaySavedWorkouts();
+}
+
+// Function to generate random workout data (replace with your actual function)
+function generateRandomWorkout() {
+    // Replace the following with your logic to generate random workout data
+    const generatedCategories = ['Random Exercise 1', 'Random Exercise 2', 'Random Exercise 3'];
+
+    const userInputs = [
+        { sets: Math.floor(Math.random() * 4) + 1, reps: Math.floor(Math.random() * 15) + 5, weight: Math.floor(Math.random() * 50) + 1 + 'kg' },
+        { sets: Math.floor(Math.random() * 4) + 1, reps: Math.floor(Math.random() * 15) + 5, weight: Math.floor(Math.random() * 50) + 1 + 'kg' },
+        { sets: Math.floor(Math.random() * 4) + 1, reps: Math.floor(Math.random() * 15) + 5, weight: Math.floor(Math.random() * 50) + 1 + 'kg' }
+    ];
+
+    return { generatedCategories, userInputs };
+}
+;
 
         </script>
     </body>
