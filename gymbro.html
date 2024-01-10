@@ -287,46 +287,77 @@ button {
             }
         }
 
-function saveWorkout() {
-    // Assuming you have a function to generate workout data
-    const generatedCategories = generateWorkoutCategories(); // Replace with your actual function
+function displaySavedWorkouts() {
+                const savedWorkouts = JSON.parse(localStorage.getItem('savedWorkouts')) || [];
+                const savedWorkoutsBody = document.getElementById('savedWorkoutsBody');
 
-    // Assuming you have a function to get user inputs
-    const userInputs = getUserInputs(); // Replace with your actual function
+                // Clear previous data
+                savedWorkoutsBody.innerHTML = '';
 
-    // Create a workout object with both generatedCategories and userInputs
-    const workout = {
-        date: new Date().toLocaleDateString(),
-        generatedCategories: generatedCategories,
-        userInputs: userInputs
-    };
+                savedWorkouts.forEach((workout, index) => {
+                    const row = savedWorkoutsBody.insertRow();
+                    const cellDate = row.insertCell(0);
+                    cellDate.textContent = workout.date;
+                    cellDate.classList.add('date-button');
+                    cellDate.addEventListener('click', () => toggleDetails(index));
 
-    // Get existing saved workouts from localStorage
-    const savedWorkouts = JSON.parse(localStorage.getItem('savedWorkouts')) || [];
+                    const cellDetails = row.insertCell(1);
 
-    // Add the new workout to the array
-    savedWorkouts.push(workout);
+                    const detailsRow = savedWorkoutsBody.insertRow();
+                    detailsRow.classList.add('details-row');
 
-    // Save the updated array back to localStorage
-    localStorage.setItem('savedWorkouts', JSON.stringify(savedWorkouts));
+                    const detailsCell = detailsRow.insertCell(0);
+                    detailsCell.colSpan = 2;
 
-    // Refresh the displayed workouts
-    displaySavedWorkouts();
-}
+                    const detailsTable = document.createElement('table');
+                    detailsTable.classList.add('details-table');
 
-// Function to generate sample workout categories (replace with your actual function)
-function generateWorkoutCategories() {
-    return ['Exercise 1', 'Exercise 2', 'Exercise 3'];
-}
+                    const headerRow = detailsTable.insertRow();
+                    const headers = ['Exercise', 'Sets', 'Reps', 'Weight'];
 
-// Function to get sample user inputs (replace with your actual function)
-function getUserInputs() {
-    return [
-        { sets: 3, reps: 12, weight: '50kg' },
-        { sets: 4, reps: 10, weight: '60kg' },
-        { sets: 3, reps: 15, weight: '40kg' }
-    ];
-}
+                    headers.forEach(headerText => {
+                        const header = document.createElement('th');
+                        header.textContent = headerText;
+                        headerRow.appendChild(header);
+                    });
+
+                    const maxRows = Math.max(workout.generatedCategories.length, workout.userInputs.length);
+
+                    for (let i = 0; i < maxRows; i++) {
+                        const exerciseRow = detailsTable.insertRow();
+
+                        const generatedExercise = workout.generatedCategories[i] || '';
+                        const generatedCell = exerciseRow.insertCell();
+                        generatedCell.textContent = generatedExercise;
+
+                        const userInput = workout.userInputs[i] || { sets: '', reps: '', weight: '' };
+                        const inputData = [userInput.sets, userInput.reps, userInput.weight];
+
+                        inputData.forEach(data => {
+                            const cell = exerciseRow.insertCell();
+                            cell.textContent = data === undefined ? '' : data;
+                        });
+                    }
+
+                    detailsCell.appendChild(detailsTable);
+                });
+            }
+
+            function toggleDetails(index) {
+                const detailsRow = document.querySelectorAll('.details-row')[index];
+                detailsRow.classList.toggle('active');
+            }
+
+            // Add event listener to the button
+            document.getElementById('toggleButton').addEventListener('click', () => {
+                const detailsTable = document.getElementById('savedWorkoutsTable');
+                detailsTable.style.display = detailsTable.style.display === 'none' ? '' : 'none';
+            });
+
+            // Initially hide the saved workouts section
+            document.getElementById('savedWorkoutsTable').style.display = 'none';
+
+            displaySavedWorkouts();
 
 
 
