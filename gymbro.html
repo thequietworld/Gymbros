@@ -286,78 +286,79 @@ button {
                 likelihood -= 0.1; // Decrease likelihood for the next repetition
             }
         }
+                  function displaySavedWorkouts() {
+              const savedWorkouts = JSON.parse(localStorage.getItem('savedWorkouts')) || [];
+              const savedWorkoutsBody = document.getElementById('savedWorkoutsBody');
 
-function displaySavedWorkouts() {
-                const savedWorkouts = JSON.parse(localStorage.getItem('savedWorkouts')) || [];
-                const savedWorkoutsBody = document.getElementById('savedWorkoutsBody');
+              // Clear previous data
+              savedWorkoutsBody.innerHTML = '';
 
-                // Clear previous data
-                savedWorkoutsBody.innerHTML = '';
+              savedWorkouts.forEach((workout, index) => {
+                  const row = savedWorkoutsBody.insertRow();
+                  const cellDate = row.insertCell(0);
+                  cellDate.textContent = workout.date;
+                  cellDate.classList.add('date-button');
+                  cellDate.addEventListener('click', () => toggleDetails(index));
 
-                savedWorkouts.forEach((workout, index) => {
-                    const row = savedWorkoutsBody.insertRow();
-                    const cellDate = row.insertCell(0);
-                    cellDate.textContent = workout.date;
-                    cellDate.classList.add('date-button');
-                    cellDate.addEventListener('click', () => toggleDetails(index));
+                  const cellDetails = row.insertCell(1);
 
-                    const cellDetails = row.insertCell(1);
+                  const detailsRow = savedWorkoutsBody.insertRow();
+                  detailsRow.classList.add('details-row');
 
-                    const detailsRow = savedWorkoutsBody.insertRow();
-                    detailsRow.classList.add('details-row');
+                  const detailsCell = detailsRow.insertCell(0);
+                  detailsCell.colSpan = 2;
 
-                    const detailsCell = detailsRow.insertCell(0);
-                    detailsCell.colSpan = 2;
+                  const detailsTable = document.createElement('table');
+                  detailsTable.classList.add('details-table');
 
-                    const detailsTable = document.createElement('table');
-                    detailsTable.classList.add('details-table');
+                  const headerRow = detailsTable.insertRow();
+                  const headers = ['Exercise', 'Sets', 'Reps', 'Weight'];
 
-                    const headerRow = detailsTable.insertRow();
-                    const headers = ['Exercise', 'Sets', 'Reps', 'Weight'];
+                  headers.forEach(headerText => {
+                      const header = document.createElement('th');
+                      header.textContent = headerText;
+                      headerRow.appendChild(header);
+                  });
 
-                    headers.forEach(headerText => {
-                        const header = document.createElement('th');
-                        header.textContent = headerText;
-                        headerRow.appendChild(header);
-                    });
+                  const maxRows = Math.max(workout.generatedCategories.length, workout.userInputs.length);
 
-                    const maxRows = Math.max(workout.generatedCategories.length, workout.userInputs.length);
+                  for (let i = 0; i < maxRows; i++) {
+                      const exerciseRow = detailsTable.insertRow();
 
-                    for (let i = 0; i < maxRows; i++) {
-                        const exerciseRow = detailsTable.insertRow();
+                      const generatedExercise = workout.generatedCategories[i] || '';
+                      const generatedCell = exerciseRow.insertCell();
+                      generatedCell.textContent = generatedExercise;
 
-                        const generatedExercise = workout.generatedCategories[i] || '';
-                        const generatedCell = exerciseRow.insertCell();
-                        generatedCell.textContent = generatedExercise;
+                      const userInput = workout.userInputs[i] || { sets: '', reps: '', weight: '' };
+                      const inputData = [userInput.sets, userInput.reps, userInput.weight];
 
-                        const userInput = workout.userInputs[i] || { sets: '', reps: '', weight: '' };
-                        const inputData = [userInput.sets, userInput.reps, userInput.weight];
+                      inputData.forEach(data => {
+                          const cell = exerciseRow.insertCell();
+                          cell.textContent = data === undefined ? '' : data;
+                      });
+                  }
 
-                        inputData.forEach(data => {
-                            const cell = exerciseRow.insertCell();
-                            cell.textContent = data === undefined ? '' : data;
-                        });
-                    }
+                  detailsCell.appendChild(detailsTable);
+              });
+          }
 
-                    detailsCell.appendChild(detailsTable);
-                });
-            }
+          function toggleDetails(index) {
+              const detailsRow = document.querySelectorAll('.details-row')[index];
+              detailsRow.classList.toggle('active');
+          }
 
-            function toggleDetails(index) {
-                const detailsRow = document.querySelectorAll('.details-row')[index];
-                detailsRow.classList.toggle('active');
-            }
+          // Add event listener to the button
+          document.getElementById('toggleButton').addEventListener('click', () => {
+              const detailsTable = document.getElementById('savedWorkoutsTable');
+              detailsTable.style.display = detailsTable.style.display === 'none' ? '' : 'none';
+          });
 
-            // Add event listener to the button
-            document.getElementById('toggleButton').addEventListener('click', () => {
-                const detailsTable = document.getElementById('savedWorkoutsTable');
-                detailsTable.style.display = detailsTable.style.display === 'none' ? '' : 'none';
-            });
+          // Initially hide the saved workouts section
+          document.getElementById('savedWorkoutsTable').style.display = 'none';
 
-            // Initially hide the saved workouts section
-            document.getElementById('savedWorkoutsTable').style.display = 'none';
+          displaySavedWorkouts(); 
 
-            displaySavedWorkouts();
+
 
 
 
